@@ -27,5 +27,5 @@ interface Retrofit2ApiInterface {
     @POST("meetAppMarker")
     suspend fun postApiMarker(marker: MeetAppMarker)
     @DELETE("meetAppMarkers/{id}")
-    suspend fun deleteApiMarkers(@Path("id")id:String)
+    suspend fun deleteApiMarkers(@Path("id") id: Int)
 }
