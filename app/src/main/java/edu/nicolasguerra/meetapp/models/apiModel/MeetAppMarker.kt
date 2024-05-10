@@ -7,7 +7,7 @@ data class MeetAppMarker(
     @SerializedName("description")
     val description: String?="",
     @SerializedName("_id")
-    val id: String,
+    val id: Int,
     @SerializedName("latLang")
     val latLang: String
 )

@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
     override fun onResume() {
         super.onResume()
         mapView.onResume()
