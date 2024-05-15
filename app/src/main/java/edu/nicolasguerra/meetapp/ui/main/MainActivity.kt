@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapView: MapView
 
     private val vm: MainViewModel by viewModels {
-        val db = (application as MyRoomApplication).markerDatabase
+        val db = (application as MyRoomApplication).markerDB
         val dataSource= MarkerDataSource(db.markersDao())
         val repository= MarkerRepository(dataSource)
         MainViewModelFactory(repository)
@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         mapView = binding.map
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
@@ -58,7 +57,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 .setMessage("¿Eliminar marcador?")
                 .setPositiveButton("Sí") { dialog, which ->
                     marker.remove()
-                    vm.deleteMarker(MarkerEntity(coordenadas = marker.position))
+                    vm.deleteMarker(vm.getMarkerByCoordenadas(marker.position.toString()))
                 }
                 .setNegativeButton("No") { dialog, which ->
                     // No hacer nada si el usuario cancela la eliminación del marcador

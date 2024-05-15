@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Database(entities = [MarkerEntity::class, Favorito::class], version = 1)
 @TypeConverters(LatLangConverter::class)
-abstract class MarkerDatabase : RoomDatabase() {
+abstract class MarkerDB : RoomDatabase() {
     abstract fun markersDao(): MarkersDao
 
     override fun clearAllTables() {
@@ -46,6 +46,10 @@ interface MarkersDao {
 
     @Query("SELECT * FROM MarkerEntity")
     fun getMarkerEntities(): Flow<List<MarkerEntity>>
+
+    @Query("SELECT * FROM MarkerEntity WHERE coordenadas = :coordenadas")
+    fun getMarkerByCoordenadas(coordenadas: String): MarkerEntity
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavorito(favorito: Favorito)

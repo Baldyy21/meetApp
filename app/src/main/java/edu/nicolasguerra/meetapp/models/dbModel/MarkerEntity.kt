@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import edu.nicolasguerra.meetapp.models.apiModel.MeetAppMarker
+import edu.nicolasguerra.meetapp.converters.LatLangConverter
 
 @Entity
 data class MarkerEntity(
@@ -12,6 +13,7 @@ data class MarkerEntity(
     val description: String?=""
     ) {
     fun toApi(): MeetAppMarker {
-    return MeetAppMarker(description = this.description, latLang = this.coordenadas.toString(),id=this.id )
+
+    return MeetAppMarker(description = this.description, latLng = this.coordenadas.toString(),id=this.id )
     }
 }

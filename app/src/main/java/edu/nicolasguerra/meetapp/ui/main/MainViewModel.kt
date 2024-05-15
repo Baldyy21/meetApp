@@ -26,6 +26,9 @@ class MainViewModel(private val repository: MarkerRepository) : ViewModel() {
             repository.deleteMarker(markerEntity)
         }
     }
+    fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
+        return repository.getMarkerByCoordenadas(coordenadas)
+    }
 
     fun insertFavorito(favorito: Favorito) {
         viewModelScope.launch {

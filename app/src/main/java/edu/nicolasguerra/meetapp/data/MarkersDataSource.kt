@@ -1,5 +1,6 @@
 package edu.nicolasguerra.meetapp.data
 
+import android.util.Log
 import edu.nicolasguerra.meetapp.data.apiData.Retrofit2Api
 import edu.nicolasguerra.meetapp.data.dbData.MarkersDao
 import edu.nicolasguerra.meetapp.models.Favorito
@@ -12,12 +13,19 @@ class MarkerDataSource(private val markersDao: MarkersDao) {
 
     suspend fun insertMarker(markerEntity: MarkerEntity) {
         markersDao.insertMarker(markerEntity)
+        Log.i("marker",markerEntity.toString())
+
+        Log.i("marker",markerEntity.toApi().toString())
+
         api.postApiMarker(markerEntity.toApi())
     }
 
     suspend fun deleteMarker(markerEntity: MarkerEntity) {
         markersDao.deleteMarker(markerEntity)
         api.deleteApiMarkers(markerEntity.id)
+    }
+    fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
+        return markersDao.getMarkerByCoordenadas(coordenadas)
     }
 
     fun getAiMarkers()= flow {

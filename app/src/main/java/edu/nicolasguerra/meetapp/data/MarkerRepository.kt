@@ -23,6 +23,9 @@ class MarkerRepository(private val markerDataSource: MarkerDataSource) {
     suspend fun deleteFavorito(favorito: Favorito) {
         markerDataSource.deleteFavorito(favorito)
     }
+    fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
+        return markerDataSource.getMarkerByCoordenadas(coordenadas)
+    }
 
     val allFavoritos: Flow<List<Favorito>> = markerDataSource.allFavoritos
 

@@ -1,23 +1,29 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const cors = require('cors'); // Importa el middleware cors
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/MeetApp');
+mongoose.connect('mongodb://localhost:27017/meetAppRest');
 
-const MeetAppMarker = mongoose.model('meetappmarkers', mongoose.Schema({
+const MeetAppMarker = mongoose.model('meetAppMarker', mongoose.Schema({
+    id: {
+        type: Number,
+        required: true
+    },
     description: {
+        type: String,
+        trim: true
+    },
+    latLng: {
         type: String,
         required: true,
         trim: true
-    },
-    latLang: {
-        type: String,
-        required: true
-        }
+    }
 }));
 
 let app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 function jsonResultado(result) {
@@ -34,7 +40,7 @@ function getErrorTemplate(error) {
     };
 }
 
-app.get('/meetAppMarkers', (req, res) => {
+app.get('/MeetAppMarker', (req, res) => {
     MeetAppMarker.find().then(result => {
         res.status(200).send(jsonResultado(result));
     }).catch(error => {
@@ -42,35 +48,33 @@ app.get('/meetAppMarkers', (req, res) => {
     });
 });
 
-
-app.post('/meetAppMarker', (req, res) => {
-    let marker = new MeetAppMarker({
+app.post('/MeetAppMarker', (req, res) => {
+    let meetAppMarker = new MeetAppMarker({
+        id: req.body.id,
         description: req.body.description,
-        latLang: req.body.latLang
+        latLng: req.body.latLng
     });
 
-    marker.save().then(result => {
+    meetAppMarker.save().then(result => {
         res.status(200).send(jsonResultado(result));
     }).catch(error => {
-        if (req.body.description == null) {
-            res.status(400).send(getErrorTemplate("Description cant be empty!"));
-        } else if (req.body.latLang == null) {
-            res.status(400).send(getErrorTemplate("Wrong latLang!"));
+        if (req.body.latLng == null) {
+            res.status(400).send(getErrorTemplate("latLng cant be empty!"));
         }
     });
 });
 
-app.put('/tasks/:id', (req, res)=>{
+app.put('/MeetAppMarker/:id', (req, res)=>{
     try{
-        Task.findByIdAndUpdate(req.params.id, {
+        MeetAppMarker.findByIdAndUpdate(req.params.id, {
             $set:{
                 description: req.body.description,
-                latLang: req.body.latLang
+                latLng: req.body.latLng
         }
         }).then(result =>{
             res.status(200).send(jsonResultado(result));
         }).catch(error => {
-            res.status(200).send(getErrorTemplate("Task not found"));
+            res.status(200).send(getErrorTemplate("MeetAppMarker not found"));
         });
     }catch(error){
         res.status(200).send(getErrorTemplate("Internal server error"));
@@ -78,18 +82,18 @@ app.put('/tasks/:id', (req, res)=>{
 
 });
 
-app.delete('/meetAppMarkers/:id', (req, res) => {
+app.delete('/MeetAppMarker/:id', (req, res) => {
     MeetAppMarker.findByIdAndDelete({_id:req.params.id}).then(result=>{
         if(result){
             res.status(200).send(jsonResultado(result));
         }else{
-            res.status(200).send(getErrorTemplate("Task not found"));
+            res.status(200).send(getErrorTemplate("MeetAppMarker not found"));
         }
     }).catch(error=>{
         res.status(200).send(getErrorTemplate("Internal server error"));
     });
 });
 
-app.listen(8082, () => {
-    console.log('Server is running on port 8082');
+app.listen(8081, () => {
+    console.log('Server is running on port 8081');
 });
