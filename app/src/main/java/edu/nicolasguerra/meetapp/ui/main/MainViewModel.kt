@@ -13,6 +13,10 @@ class MainViewModel(private val repository: MarkerRepository) : ViewModel() {
 
     val allMarkers: Flow<List<MarkerEntity>> = repository.allMarkers
 
+    private val _currentMarkers = repository.fetchMarkers()
+    val currentMarkers:Flow<List<MarkerEntity>>
+        get() = _currentMarkers
+
     val allFavoritos: Flow<List<Favorito>> = repository.allFavoritos
 
     fun insertMarker(markerEntity: MarkerEntity) {

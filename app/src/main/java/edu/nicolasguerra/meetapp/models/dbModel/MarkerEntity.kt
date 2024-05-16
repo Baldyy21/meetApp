@@ -13,7 +13,6 @@ data class MarkerEntity(
     val description: String?=""
     ) {
     fun toApi(): MeetAppMarker {
-
     return MeetAppMarker(description = this.description, latLng = this.coordenadas.toString(),id=this.id )
     }
 }

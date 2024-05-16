@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 class MarkerDataSource(private val markersDao: MarkersDao) {
     private val api= Retrofit2Api.getRetrofit2Api()
 
+
     suspend fun insertMarker(markerEntity: MarkerEntity) {
         markersDao.insertMarker(markerEntity)
         Log.i("marker",markerEntity.toString())
@@ -28,7 +29,7 @@ class MarkerDataSource(private val markersDao: MarkersDao) {
         return markersDao.getMarkerByCoordenadas(coordenadas)
     }
 
-    fun getAiMarkers()= flow {
+    fun getApiMarkers()= flow {
         emit(api.getApiMarkers())
     }
     val dbMarkers:Flow<List<MarkerEntity>> = markersDao.getMarkerEntities()

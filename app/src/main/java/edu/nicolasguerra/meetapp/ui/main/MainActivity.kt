@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         // Configura el mapa aquí
         val map = googleMap
         lifecycleScope.launch {
-            vm.allMarkers.collect { markers ->
+            vm.currentMarkers.collect { markers ->
               markers.forEach {
                   map.addMarker(MarkerOptions().position(it.coordenadas))
               }

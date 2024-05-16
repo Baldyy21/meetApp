@@ -42,9 +42,14 @@ function getErrorTemplate(error) {
 
 app.get('/MeetAppMarker', (req, res) => {
     MeetAppMarker.find().then(result => {
-        res.status(200).send(jsonResultado(result));
+        const markers = result.map(marker => ({
+            id: marker.id,
+            description: marker.description || '', // Si description es null o undefined, asigna una cadena vacía
+            latLng: marker.latLng // Parsea latLng a un objeto si es necesario
+        }));
+        res.status(200).json(markers);
     }).catch(error => {
-        res.status(500).send(getErrorTemplate("Internal server error"));
+        res.status(500).json(getErrorTemplate("Internal server error"));
     });
 });
 
