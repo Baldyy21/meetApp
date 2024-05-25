@@ -44,11 +44,11 @@ interface MarkersDao {
     @Delete
     suspend fun deleteMarker(markerEntity: MarkerEntity)
 
-    @Query("SELECT * FROM MarkerEntity")
+    @Query("SELECT * FROM markers")
     fun getMarkerEntities(): Flow<List<MarkerEntity>>
 
-    @Query("SELECT * FROM MarkerEntity WHERE coordenadas = :coordenadas")
-    fun getMarkerByCoordenadas(coordenadas: String): MarkerEntity
+    @Query("SELECT * FROM markers WHERE coordenadas = :coordenadas")
+    suspend fun getMarkerByCoordenadas(coordenadas: String): MarkerEntity
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

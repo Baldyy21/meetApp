@@ -12,6 +12,12 @@ class MarkerRepository(private val markerDataSource: MarkerDataSource) {
     suspend fun insertMarker(markerEntity: MarkerEntity) {
         markerDataSource.insertMarker(markerEntity)
     }
+    suspend fun insertMarkerDB(markerEntity: MarkerEntity) {
+        markerDataSource.insertMarkerDB(markerEntity)
+    }
+    suspend fun postMarkerApi(markerEntity: MarkerEntity) {
+        markerDataSource.postMarkerApi(markerEntity)
+    }
 
     suspend fun deleteMarker(markerEntity: MarkerEntity) {
         markerDataSource.deleteMarker(markerEntity)
@@ -19,14 +25,39 @@ class MarkerRepository(private val markerDataSource: MarkerDataSource) {
 
     val allMarkers: Flow<List<MarkerEntity>> = markerDataSource.dbMarkers
 
-    fun fetchMarkers():Flow<List<MarkerEntity>>{
-        return allMarkers
-            .combine(markerDataSource.getApiMarkers()) { allMarkersList, apiMarkersList ->
-                // Unificar las dos listas eliminando repetidos y convertir a MarkerEntity
-                val combinedList = (allMarkersList.map { it } + apiMarkersList.map { it.toMarkerEntity() }).distinctBy { it.id }
-                combinedList
+    // Variable para controlar si la inserción en la base de datos ya ha ocurrido
+    private var isInitialInsertionDone = false
+
+    fun fetchMarkers(): Flow<List<MarkerEntity>> {
+        val combinedFlow = allMarkers.combine(markerDataSource.getApiMarkers()) { allMarkersList, apiMarkersList ->
+            // Convertir los marcadores de la API en entidades MarkerEntity
+            val apiMarkersEntityList = apiMarkersList.map { it.toMarkerEntity() }
+
+            // Insertar los marcadores únicos en la base de datos solo la primera vez que se llama a la función
+            if (!isInitialInsertionDone) {
+                val uniqueApiMarkersList = apiMarkersEntityList.filterNot { apiMarker ->
+                    allMarkersList.any { it.id == apiMarker.id }
+                }
+                val uniqueDbMarkersList = allMarkersList.filterNot { dbMarker ->
+                    apiMarkersEntityList.any { it.id == dbMarker.id }
+                }
+                uniqueApiMarkersList.forEach { insertMarkerDB(it) }
+                uniqueDbMarkersList.forEach { postMarkerApi(it) }
+                isInitialInsertionDone = true
             }
+
+            // Combinar las listas y eliminar duplicados por ID
+            val combinedList = (allMarkersList + apiMarkersEntityList).distinctBy { it.id }
+
+            combinedList
+        }
+
+        return combinedFlow
     }
+
+
+
+
 
     suspend fun insertFavorito(favorito: Favorito) {
         markerDataSource.insertFavorito(favorito)
@@ -35,7 +66,7 @@ class MarkerRepository(private val markerDataSource: MarkerDataSource) {
     suspend fun deleteFavorito(favorito: Favorito) {
         markerDataSource.deleteFavorito(favorito)
     }
-    fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
+    suspend fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
         return markerDataSource.getMarkerByCoordenadas(coordenadas)
     }
 

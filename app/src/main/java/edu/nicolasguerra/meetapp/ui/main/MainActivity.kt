@@ -8,7 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.clustering.ClusterManager
 import edu.nicolasguerra.meetapp.MyRoomApplication
 import edu.nicolasguerra.meetapp.data.MarkerDataSource
 import edu.nicolasguerra.meetapp.data.MarkerRepository
@@ -20,6 +22,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mapView: MapView
+    private lateinit var clusterManager: ClusterManager<MarkerEntity>
 
     private val vm: MainViewModel by viewModels {
         val db = (application as MyRoomApplication).markerDB
@@ -35,38 +38,45 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView = binding.map
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        // Configura el mapa aquí
         val map = googleMap
-        lifecycleScope.launch {
-            vm.currentMarkers.collect { markers ->
-              markers.forEach {
-                  map.addMarker(MarkerOptions().position(it.coordenadas))
-              }
+        clusterManager = ClusterManager(this, map)
+
+        // Set up cluster manager
+        map.setOnCameraIdleListener(clusterManager)
+        map.setOnMarkerClickListener(clusterManager)
+
+            lifecycleScope.launch {
+                vm.currentMarkers.collect { markers ->
+                    clusterManager.clearItems()
+                    clusterManager.addItems(markers)
+                    clusterManager.cluster()
+
+                }
             }
-        }
+
         map.setOnMapLongClickListener {
-            map.addMarker(MarkerOptions().position(it))
-            vm.insertMarker(MarkerEntity(coordenadas = it))
+            val newMarker = MarkerEntity(coordenadas = it)
+            vm.insertMarker(newMarker)
+            clusterManager.addItem(newMarker)
+            clusterManager.cluster()
         }
-        map.setOnMarkerClickListener { marker ->
+
+        clusterManager.setOnClusterItemClickListener { item ->
             AlertDialog.Builder(this)
                 .setMessage("¿Eliminar marcador?")
                 .setPositiveButton("Sí") { dialog, which ->
-                    marker.remove()
-                    vm.deleteMarker(vm.getMarkerByCoordenadas(marker.position.toString()))
+                    vm.deleteMarker(item)
+                    clusterManager.removeItem(item)
+                    clusterManager.cluster()
                 }
-                .setNegativeButton("No") { dialog, which ->
-                    // No hacer nada si el usuario cancela la eliminación del marcador
-                }
+                .setNegativeButton("No") { dialog, which -> }
                 .show()
-            true // Devolver true para indicar que el clic en el marcador ha sido manejado
+            true
         }
     }
-
 
     override fun onResume() {
         super.onResume()

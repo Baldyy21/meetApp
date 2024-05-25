@@ -3,6 +3,7 @@ package edu.nicolasguerra.meetapp.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import edu.nicolasguerra.meetapp.converters.LatLangConverter
 import edu.nicolasguerra.meetapp.data.MarkerRepository
 import edu.nicolasguerra.meetapp.models.Favorito
 import edu.nicolasguerra.meetapp.models.dbModel.MarkerEntity
@@ -10,8 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: MarkerRepository) : ViewModel() {
-
-    val allMarkers: Flow<List<MarkerEntity>> = repository.allMarkers
+    private val conversor = LatLangConverter()
 
     private val _currentMarkers = repository.fetchMarkers()
     val currentMarkers:Flow<List<MarkerEntity>>
@@ -27,12 +27,11 @@ class MainViewModel(private val repository: MarkerRepository) : ViewModel() {
 
     fun deleteMarker(markerEntity: MarkerEntity) {
         viewModelScope.launch {
-            repository.deleteMarker(markerEntity)
+            var marker=repository.getMarkerByCoordenadas(conversor.fromLatLng(markerEntity.coordenadas))
+            repository.deleteMarker(marker)
         }
     }
-    fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
-        return repository.getMarkerByCoordenadas(coordenadas)
-    }
+
 
     fun insertFavorito(favorito: Favorito) {
         viewModelScope.launch {

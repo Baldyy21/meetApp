@@ -21,12 +21,20 @@ class MarkerDataSource(private val markersDao: MarkersDao) {
         api.postApiMarker(markerEntity.toApi())
     }
 
+    suspend fun postMarkerApi(markerEntity: MarkerEntity) {
+        api.postApiMarker(markerEntity.toApi())
+        Log.i("marker", markerEntity.toString())
+    }
+    suspend fun insertMarkerDB(markerEntity: MarkerEntity) {
+        markersDao.insertMarker(markerEntity)
+        Log.i("marker", markerEntity.toString())
+    }
     suspend fun deleteMarker(markerEntity: MarkerEntity) {
         markersDao.deleteMarker(markerEntity)
         api.deleteApiMarkers(markerEntity.id)
     }
-    fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
-        return markersDao.getMarkerByCoordenadas(coordenadas)
+    suspend fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
+            return markersDao.getMarkerByCoordenadas(coordenadas)
     }
 
     fun getApiMarkers()= flow {
