@@ -4,24 +4,25 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/meetAppRest',).catch(error => {
+mongoose.connect('mongodb://localhost:27017/meetAppRest').catch(error => {
     console.error("Database connection error:", error);
 });
 
 const MeetAppMarker = mongoose.model('meetAppMarker', mongoose.Schema({
-    id: {
-        type: Number,
-        required: true,
-        unique: true
-    },
+    
     description: {
         type: String,
         trim: true
     },
-    latLng: {
-        type: String,
+    latitud: {
+        type: Number,
         required: true,
-        trim: true
+        trim: true,
+    },
+    longitud: {
+        type: Number,
+        required: true,
+        trim: true,
     }
 }));
 
@@ -46,9 +47,9 @@ function getErrorTemplate(error) {
 app.get('/MeetAppMarker', (req, res) => {
     MeetAppMarker.find().then(result => {
         const markers = result.map(marker => ({
-            id: marker.id,
             description: marker.description || '',
-            latLng: marker.latLng
+            latitud: marker.latitud,
+            longitud: marker.longitud
         }));
         console.log("Markers", result);
         res.status(200).json(markers);
@@ -59,48 +60,40 @@ app.get('/MeetAppMarker', (req, res) => {
 });
 
 app.post('/MeetAppMarker', (req, res) => {
-    let meetAppMarker = new MeetAppMarker({
-        id: req.body.id,
-        description: req.body.description,
-        latLng: req.body.latLng
-    });
-
-    meetAppMarker.save().then(result => {
-        console.log("Marker added:", result);
-        res.status(200).send(jsonResultado(result));
-    }).catch(error => {
-        console.error("Error adding marker:", error);
-        if (req.body.latLng == null) {
-            res.status(400).send(getErrorTemplate("latLng can't be empty!"));
+    MeetAppMarker.findOne({ latitud: req.body.latitud, longitud: req.body.longitud }).then(existingMarker => {
+        if (existingMarker) {
+            console.log("Marker with the same coordinates already exists, ignoring insertion.");
+            res.status(200).send(jsonResultado(existingMarker));
         } else {
-            res.status(500).send(getErrorTemplate("Internal server error"));
-        }
-    });
-});
+            let meetAppMarker = new MeetAppMarker({
+                description: req.body.description,
+                latitud: req.body.latitud,
+                longitud: req.body.longitud
+            });
 
-app.put('/MeetAppMarker/:id', (req, res) => {
-    MeetAppMarker.updateOne({ id: req.params.id }, {
-        $set: {
-            description: req.body.description,
-            latLng: req.body.latLng
-        }
-    }).then(result => {
-        if (result.nModified > 0) {
-            res.status(200).send(jsonResultado(result));
-        } else {
-            res.status(404).send(getErrorTemplate("MeetAppMarker not found"));
+            meetAppMarker.save().then(result => {
+                console.log("Marker added:", result);
+                res.status(200).send(jsonResultado(result));
+            }).catch(error => {
+                console.error("Error adding marker:", error);
+                res.status(500).send(getErrorTemplate("Internal server error"));
+            });
         }
     }).catch(error => {
-        console.error("Error updating marker:", error);
+        console.error("Error checking existing markers:", error);
         res.status(500).send(getErrorTemplate("Internal server error"));
     });
 });
 
-app.delete('/MeetAppMarker/:id', (req, res) => {
-    MeetAppMarker.deleteOne({ id: req.params.id }).then(result => {
+
+app.delete('/MeetAppMarker/:latitude/:longitude', (req, res) => {
+    var latitude = parseFloat(req.params.latitude);
+    var longitude = parseFloat(req.params.longitude);
+    
+    MeetAppMarker.deleteOne({ latitud: latitude, longitud: longitude }).then(result => {
         if (result.deletedCount > 0) {
-            res.status(200).send(jsonResultado(result));
-            console.log("Marker deleted:", req.params.id);
+            console.log("Marker deleted at:", latitude, longitude);
+            res.status(200).send(jsonResultado("MeetAppMarker deleted successfully"));
         } else {
             res.status(404).send(getErrorTemplate("MeetAppMarker not found"));
         }

@@ -1,50 +1,29 @@
 package edu.nicolasguerra.meetapp.ui.main
 
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import edu.nicolasguerra.meetapp.converters.LatLangConverter
 import edu.nicolasguerra.meetapp.data.MarkerRepository
-import edu.nicolasguerra.meetapp.models.Favorito
 import edu.nicolasguerra.meetapp.models.dbModel.MarkerEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: MarkerRepository) : ViewModel() {
-    private val conversor = LatLangConverter()
 
     private val _currentMarkers = repository.fetchMarkers()
     val currentMarkers:Flow<List<MarkerEntity>>
         get() = _currentMarkers
 
-    val allFavoritos: Flow<List<Favorito>> = repository.allFavoritos
-
-    fun insertMarker(markerEntity: MarkerEntity) {
+    fun deleteMarker(latidud:Double, longitud:Double) {
         viewModelScope.launch {
-            repository.insertMarker(markerEntity)
-        }
-    }
-
-    fun deleteMarker(markerEntity: MarkerEntity) {
-        viewModelScope.launch {
-            var marker=repository.getMarkerByCoordenadas(conversor.fromLatLng(markerEntity.coordenadas))
-            repository.deleteMarker(marker)
+            repository.deleteMarker(latidud, longitud)
         }
     }
 
 
-    fun insertFavorito(favorito: Favorito) {
-        viewModelScope.launch {
-            repository.insertFavorito(favorito)
-        }
     }
 
-    fun deleteFavorito(favorito: Favorito) {
-        viewModelScope.launch {
-            repository.deleteFavorito(favorito)
-        }
-    }
-}
 
 class MainViewModelFactory(private val repository: MarkerRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

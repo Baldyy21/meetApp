@@ -3,7 +3,6 @@ package edu.nicolasguerra.meetapp.data
 import android.util.Log
 import edu.nicolasguerra.meetapp.data.apiData.Retrofit2Api
 import edu.nicolasguerra.meetapp.data.dbData.MarkersDao
-import edu.nicolasguerra.meetapp.models.Favorito
 import edu.nicolasguerra.meetapp.models.dbModel.MarkerEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,25 +15,20 @@ class MarkerDataSource(private val markersDao: MarkersDao) {
         markersDao.insertMarker(markerEntity)
         Log.i("marker",markerEntity.toString())
 
-        Log.i("marker",markerEntity.toApi().toString())
-
-        api.postApiMarker(markerEntity.toApi())
+        api.postApiMarker(markerEntity)
     }
 
-    suspend fun postMarkerApi(markerEntity: MarkerEntity) {
-        api.postApiMarker(markerEntity.toApi())
-        Log.i("marker", markerEntity.toString())
-    }
+
     suspend fun insertMarkerDB(markerEntity: MarkerEntity) {
         markersDao.insertMarker(markerEntity)
         Log.i("marker", markerEntity.toString())
     }
-    suspend fun deleteMarker(markerEntity: MarkerEntity) {
-        markersDao.deleteMarker(markerEntity)
-        api.deleteApiMarkers(markerEntity.id)
+    suspend fun deleteMarker(latidud:Double, longitud:Double) {
+        api.deleteApiMarkers(latidud, longitud)
+        markersDao.deleteMarker(latidud, longitud)
     }
-    suspend fun getMarkerByCoordenadas(coordenadas: String):MarkerEntity {
-            return markersDao.getMarkerByCoordenadas(coordenadas)
+    suspend fun deleteMarkerDB(latidud:Double, longitud:Double) {
+        markersDao.deleteMarker(latidud, longitud)
     }
 
     fun getApiMarkers()= flow {
@@ -42,14 +36,5 @@ class MarkerDataSource(private val markersDao: MarkersDao) {
     }
     val dbMarkers:Flow<List<MarkerEntity>> = markersDao.getMarkerEntities()
 
-    suspend fun insertFavorito(favorito: Favorito) {
-        markersDao.insertFavorito(favorito)
-    }
-
-    suspend fun deleteFavorito(favorito: Favorito) {
-        markersDao.deleteFavorito(favorito)
-    }
-
-    val allFavoritos:Flow<List<Favorito>> = markersDao.getFavoritos()
 
 }

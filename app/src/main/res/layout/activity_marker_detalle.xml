@@ -5,6 +5,78 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.detail.markerDetalle">
+    android:theme="@style/Base.Theme.MeetApp"
+    android:background="?attr/colorPrimary"
+    tools:context=".ui.detail.MarkerDetalle">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="72dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="323dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/favorito"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="650dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/favorite" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="238dp"
+        android:inputType="text"
+        android:layout_height="150dp"
+        android:layout_marginStart="86dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="87dp"
+        android:layout_marginBottom="29dp"
+        android:autofillHints="@string/input_Text"
+        android:background="?attr/textAppearanceBody1"
+        android:gravity="top|start"
+        android:hint="@string/input_Text"
+        android:textAlignment="viewStart"
+        android:textColor="?attr/textFillColor"
+        android:textColorHint="?attr/textFillColor"
+        android:textSize="14sp"
+        android:theme="@style/Base.Theme.MeetApp"
+        app:layout_constraintBottom_toTopOf="@+id/btnGuardar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mapView" />
+
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="328dp"
+        android:layout_height="211dp"
+        android:layout_marginStart="41dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="42dp"
+        android:layout_marginBottom="17dp"
+        app:layout_constraintBottom_toTopOf="@+id/editText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <Button
+        android:id="@+id/btnGuardar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="157dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="166dp"
+        android:layout_marginBottom="123dp"
+        android:background="@android:color/holo_green_dark"
+        android:text="@string/btn_guardar"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.09"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+        app:rippleColor="#A8CF49" />
 </androidx.constraintlayout.widget.ConstraintLayout>

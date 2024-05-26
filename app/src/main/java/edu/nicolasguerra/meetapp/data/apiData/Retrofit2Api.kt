@@ -1,6 +1,6 @@
 package edu.nicolasguerra.meetapp.data.apiData
 
-import edu.nicolasguerra.meetapp.models.apiModel.MeetAppMarker
+import edu.nicolasguerra.meetapp.models.dbModel.MarkerEntity
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -24,9 +24,9 @@ class Retrofit2Api {
 }
 interface Retrofit2ApiInterface {
     @GET("MeetAppMarker")
-    suspend fun getApiMarkers(): ArrayList<MeetAppMarker>
+    suspend fun getApiMarkers(): ArrayList<MarkerEntity>
     @POST("MeetAppMarker")
-    suspend fun postApiMarker(@Body marker: MeetAppMarker)
-            @DELETE("MeetAppMarker/{id}")
-            suspend fun deleteApiMarkers(@Path("id") id: Int)
+    suspend fun postApiMarker(@Body marker: MarkerEntity)
+    @DELETE("/MeetAppMarker/{latitude}/{longitude}")
+    suspend fun deleteApiMarkers(@Path("latitude") latitude: Double, @Path("longitude") longitude: Double)
 }

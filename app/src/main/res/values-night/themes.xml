@@ -1,7 +1,11 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.MeetApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <item name="colorPrimary">@color/my_Primary</item>
+    <style name="Base.Theme.MeetApp" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/night_Primary</item>
+        <item name="colorPrimaryDark">@color/night_Primary</item>
+        <item name="colorAccent">@color/night_fav</item>
+        <item name="textFillColor">@color/night_Text</item>
+        <item name="textAppearanceBody1">@color/night_TextBackground</item>
+
     </style>
 </resources>

@@ -1,7 +1,12 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.MeetApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/my_Primary</item>
+    <style name="Base.Theme.MeetApp" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/light_Primary</item>
+        <item name="colorPrimaryDark">@color/light_Primary</item>
+        <item name="colorAccent">@color/light_fav</item>
+        <item name="textFillColor">@color/light_Text</item>
+        <item name="textAppearanceBody1">@color/light_TextBackground</item>
+
     </style>
 
     <style name="Theme.MeetApp" parent="Base.Theme.MeetApp" />

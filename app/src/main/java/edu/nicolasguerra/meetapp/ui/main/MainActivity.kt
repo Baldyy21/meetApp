@@ -1,21 +1,23 @@
 package edu.nicolasguerra.meetapp.ui.main
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.ClusterManager
 import edu.nicolasguerra.meetapp.MyRoomApplication
 import edu.nicolasguerra.meetapp.data.MarkerDataSource
 import edu.nicolasguerra.meetapp.data.MarkerRepository
 import edu.nicolasguerra.meetapp.databinding.ActivityMainBinding
 import edu.nicolasguerra.meetapp.models.dbModel.MarkerEntity
+import edu.nicolasguerra.meetapp.ui.detail.MarkerDetalle
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -23,6 +25,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMainBinding
     private lateinit var mapView: MapView
     private lateinit var clusterManager: ClusterManager<MarkerEntity>
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
 
     private val vm: MainViewModel by viewModels {
         val db = (application as MyRoomApplication).markerDB
@@ -38,8 +42,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView = binding.map
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        swipeRefreshLayout=binding.swipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener {
+            cargarMarkers()
+        }
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     override fun onMapReady(googleMap: GoogleMap) {
         val map = googleMap
         clusterManager = ClusterManager(this, map)
@@ -48,34 +57,37 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         map.setOnCameraIdleListener(clusterManager)
         map.setOnMarkerClickListener(clusterManager)
 
-            lifecycleScope.launch {
-                vm.currentMarkers.collect { markers ->
-                    clusterManager.clearItems()
-                    clusterManager.addItems(markers)
-                    clusterManager.cluster()
+        cargarMarkers()
 
-                }
-            }
-
-        map.setOnMapLongClickListener {
-            val newMarker = MarkerEntity(coordenadas = it)
-            vm.insertMarker(newMarker)
-            clusterManager.addItem(newMarker)
-            clusterManager.cluster()
+        map.setOnMapLongClickListener { latLng ->
+            val intentDetail = Intent(this, MarkerDetalle::class.java)
+            intentDetail.putExtra("latLang", latLng)
+            startActivity(intentDetail)
         }
 
         clusterManager.setOnClusterItemClickListener { item ->
             AlertDialog.Builder(this)
                 .setMessage("¿Eliminar marcador?")
-                .setPositiveButton("Sí") { dialog, which ->
-                    vm.deleteMarker(item)
+                .setPositiveButton("Sí") { _, _ ->
+                    vm.deleteMarker(latidud = item.latitud, longitud = item.longitud)
                     clusterManager.removeItem(item)
                     clusterManager.cluster()
                 }
-                .setNegativeButton("No") { dialog, which -> }
+                .setNegativeButton("No") { _, _ -> }
                 .show()
             true
         }
+    }
+
+    private fun cargarMarkers() {
+        lifecycleScope.launch {
+            vm.currentMarkers.collect { markers ->
+                clusterManager.clearItems()
+                clusterManager.addItems(markers)
+                clusterManager.cluster()
+            }
+        }
+        swipeRefreshLayout.isRefreshing = false
     }
 
     override fun onResume() {
