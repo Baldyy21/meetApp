@@ -1,6 +1,7 @@
 package edu.nicolasguerra.meetapp.ui.main
 
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -18,6 +19,11 @@ class MainViewModel(private val repository: MarkerRepository) : ViewModel() {
     fun deleteMarker(latidud:Double, longitud:Double) {
         viewModelScope.launch {
             repository.deleteMarker(latidud, longitud)
+        }
+    }
+    fun updateMarker(latitud: Double, longitud: Double, description: String?){
+        viewModelScope.launch {
+            repository.updateMarker(latitud, longitud, description)
         }
     }
 

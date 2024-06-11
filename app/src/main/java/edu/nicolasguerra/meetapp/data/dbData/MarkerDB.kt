@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.InvalidationTracker
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import edu.nicolasguerra.meetapp.models.Favorito
 import edu.nicolasguerra.meetapp.models.dbModel.MarkerEntity
@@ -43,5 +44,6 @@ interface MarkersDao {
     @Query("SELECT * FROM markers")
     fun getMarkerEntities(): Flow<List<MarkerEntity>>
 
-
+    @Query("UPDATE markers SET description = :description WHERE latitud = :latitud AND longitud = :longitud")
+    suspend fun updateMarker(latitud: Double, longitud: Double, description: String?)
 }

@@ -4,5 +4,7 @@
     <string name="API_KEY">AIzaSyCLTTUrDqHMzPYuKYDiS_9oJgxsF4XtVmY</string>
     <string name="input_Text">Inserte descripcion de marcador</string>
     <string name="favorito">Boton de favorito</string>
+    <string name="error_conexion">No se ha podido locazilar la api, los cambios se perderan cuando recuperes la conexión</string>
+
 
 </resources>

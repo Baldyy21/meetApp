@@ -23,7 +23,8 @@ import edu.nicolasguerra.meetapp.models.dbModel.MarkerEntity
 class MarkerDetalle : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMarkerDetalleBinding
     private lateinit var mapView: MapView
-    lateinit var coordenadas : LatLng
+    private lateinit var coordenadas : LatLng
+    private var isEdicion: Boolean = false
 
     private val vm: DetailViewModel by viewModels {
         val db = (application as MyRoomApplication).markerDB
@@ -36,6 +37,10 @@ class MarkerDetalle : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMarkerDetalleBinding.inflate(layoutInflater)
         enableEdgeToEdge()
         coordenadas = intent.getParcelableExtra("latLang",LatLng::class.java)!!
+        if (intent.getStringExtra("description")!=null){
+                binding.editText.setText(intent.getStringExtra("description").toString())
+            isEdicion = true
+        }
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -49,9 +54,15 @@ class MarkerDetalle : AppCompatActivity(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         binding.btnGuardar.setOnClickListener {
-            saveMarkerDetails()
+            if (isEdicion){
+                updateMarker()
+            }else{
+                saveMarkerDetails()
+            }
         }
+
     }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         val map = googleMap
@@ -71,6 +82,10 @@ class MarkerDetalle : AppCompatActivity(), OnMapReadyCallback {
     private fun saveMarkerDetails() {
         val marker = MarkerEntity(longitud = this.coordenadas.longitude, latitud = this.coordenadas.latitude, description = binding.editText.text.toString())
         vm.insertMarker(marker)
+        finish()
+    }
+    private fun updateMarker(){
+    vm.updateMarker(longitud = this.coordenadas.longitude, latitud = this.coordenadas.latitude, description = binding.editText.text.toString())
         finish()
     }
 

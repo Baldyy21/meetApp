@@ -14,6 +14,11 @@ class DetailViewModel(private val repository: MarkerRepository):ViewModel() {
                 repository.insertMarker(markerEntity)
             }
         }
+        fun updateMarker(latitud: Double, longitud: Double, description: String?){
+            viewModelScope.launch {
+                repository.updateMarker(latitud, longitud, description)
+            }
+        }
 
 
 

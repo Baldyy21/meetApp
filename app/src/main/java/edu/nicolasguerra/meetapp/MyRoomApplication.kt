@@ -13,7 +13,7 @@ class MyRoomApplication :Application(){
         markerDB= Room.databaseBuilder(
             this,
             MarkerDB::class.java,
-            name = "base__datos"
+            name = "base_de_datos"
         ).build()
     }
 }
